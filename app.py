@@ -67,7 +67,7 @@ def main():
     soc_heirarchy_map = load_soc_heirarchy("soc_hierarchy.csv")
     onet_map = load_map_onet_soc("map_onet_soc.csv")
     
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect("output.db")
 
     create_table_sqlite = '''CREATE TABLE JOB_POSTINGS
     (ID INT PRIMARY KEY NOT NULL,
@@ -137,6 +137,7 @@ def main():
             conn.execute(sqlite_statement)
             conn.commit()
             id += 1
+        f.close()
 
 
     active_postings_feb_1_2017 = 0
@@ -147,6 +148,9 @@ def main():
     for row in c:
         if datetime.datetime.strptime(row[0], '%Y-%m-%d') < special_date < datetime.datetime.strptime(row[1], '%Y-%m-%d'):
             active_postings_feb_1_2017 += 1
+
+
+    conn.close()
 
     print("Number of documents from which HTML tags were successfully removed: " + str(bodies_with_html))
     print("Count of documents for each soc2")
