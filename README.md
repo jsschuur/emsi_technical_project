@@ -6,7 +6,7 @@ The purpose of this program is to stream the data from sample.gz and compile it 
 
 The entirety of the program can be found in app.py
 
-the app can be run with the command ```'python3 app.py'
+the app can be run with the command ```python3 app.py```
 
 the database should not exist in the directory of the program prior to execution
 
