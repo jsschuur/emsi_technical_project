@@ -9,10 +9,8 @@ The entirety of the program can be found in app.py
 the app can be run by opening a terminal in the directory of app.py and executing the command ```python3 app.py```
     
     1. Open a terminal
-    
     2. Navigate to the directory that contains app.py
-    
-    3. run '''python3 app.py'''
+    3. run python3 app.py
 
 the database should not exist in the directory of the program prior to execution
 
