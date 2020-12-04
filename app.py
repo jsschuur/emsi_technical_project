@@ -3,6 +3,11 @@ import gzip
 import sqlite3
 import re
 import json
+import datetime
+
+
+
+
 
 def remove_html_tags(string):
     clean = re.compile('<.*?>')
@@ -53,6 +58,10 @@ def load_map_onet_soc(path):
                 print("Duplicate Key")
     return onet_soc_map
 
+def print_object_nicely(obj):
+    for key in obj:
+        print(key + ": " + str(obj[key]))
+
 def main():
 
     soc_heirarchy_map = load_soc_heirarchy("soc_hierarchy.csv")
@@ -73,12 +82,18 @@ def main():
     SOC2 TEXT)'''
     conn.execute(create_table_sqlite)
 
+    soc2_dict = {}
+    bodies_with_html = 0
     id = 0
+
     with gzip.open("sample.gz") as f:
         for line in f:
             data_object = json.loads(line.decode())
             soc5 = onet_map[data_object["onet"]]
             
+            clean = re.compile('<.*?>')
+            if clean.search(data_object['body']):
+                bodies_with_html += 1
 
             #not the most elegant string doctoring.......
             try:
@@ -95,6 +110,12 @@ def main():
                     data_object['onet'].replace("'","''")  + "', '" +  \
                     soc5.replace("'","''")  + "', '" + \
                     soc2[0] + "')"
+
+                if soc2[0] in soc2_dict:
+                    soc2_dict[soc2[0]] += 1
+                else:
+                    soc2_dict[soc2[0]] = 1
+
 
             except KeyError:
                 sqlite_values_string = "(" + \
@@ -117,10 +138,19 @@ def main():
             conn.commit()
             id += 1
 
+
+    active_postings_feb_1_2017 = 0
+
+    special_date = datetime.datetime.strptime('2017-2-1', '%Y-%m-%d')
+
     c = conn.execute('SELECT posted, expired from JOB_POSTINGS')
     for row in c:
-        print(row)
+        if datetime.datetime.strptime(row[0], '%Y-%m-%d') < special_date < datetime.datetime.strptime(row[1], '%Y-%m-%d'):
+            active_postings_feb_1_2017 += 1
 
-
+    print("Number of documents from which HTML tags were successfully removed: " + str(bodies_with_html))
+    print("Count of documents for each soc2")
+    print_object_nicely(soc2_dict)
+    print("Number of postings active on February 1st, 2017: " + str(active_postings_feb_1_2017))
 if __name__ == "__main__":
     main()
